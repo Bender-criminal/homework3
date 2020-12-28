@@ -1,0 +1,14 @@
+<persistence-unit>
+    <description>Hibernate EntityManager</description>
+    <class>ru.digitalhabbits.homework3.domain.Person</class>
+    <class>ru.digitalhabbits.homework3.domain.Department</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+        <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL10Dialect"/>
+        <property name="hibernate.hbm2ddl.auto" value="update"/>
+        <property name="javax.persistence.jdbc.driver" value="com.postgres.jdbc.Driver"/>
+        <property name="javax.persistence.jdbc.url" value="jdbc:postgres://127.0.0.1:5432/homework3"/>
+        <property name="javax.persistence.jdbc.user" value="postgres"/>
+        <property name="javax.persistence.jdbc.password" value="postgres"/>
+    </properties>
+</persistence-unit>

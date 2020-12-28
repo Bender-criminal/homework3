@@ -6,6 +6,7 @@ import ru.digitalhabbits.homework3.domain.Person;
 
 import javax.annotation.Nonnull;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -18,26 +19,38 @@ public class PersonDaoImpl
 
     @Override
     public Person findById(@Nonnull Integer id) {
-        // TODO: NotImplemented
-//        throw new NotImplementedException();
         return entityManager.find(Person.class, id);
     }
 
     @Override
     public List<Person> findAll() {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
+        return entityManager.createQuery("select person from Person person").getResultList();
     }
 
     @Override
     public Person update(Person entity) {
-        // TODO: NotImplemented
-        throw new NotImplementedException();
+        return entityManager.merge(entity);
     }
 
     @Override
     public Person delete(Integer integer) {
-        // TODO: NotImplemented
-        throw new NotImplementedException();
+
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        Person person = findById(integer);
+        entityManager.remove(person);
+        transaction.commit();
+        return person;
+    }
+
+    @Override
+    public Integer create(Person entity) {
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.persist(entity);
+        transaction.commit();
+        return entity.getId();
     }
 }

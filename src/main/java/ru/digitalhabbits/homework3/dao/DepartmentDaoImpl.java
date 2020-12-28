@@ -39,4 +39,10 @@ public class DepartmentDaoImpl
         // TODO: NotImplemented
         throw new NotImplementedException();
     }
+
+    @Override
+    public Integer create(Department entity) {
+        // TODO: NotImplemented
+        throw new NotImplementedException();
+    }
 }

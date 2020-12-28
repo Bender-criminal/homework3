@@ -30,6 +30,7 @@ public class PersonController {
     @ApiResponse(responseCode = "200", description = "Get person info by Id")
     @GetMapping("/{id}")
     public PersonResponse person(@PathVariable Integer id) {
+
         return personService.getPerson(id);
     }
 
@@ -58,4 +59,5 @@ public class PersonController {
     public void deletePerson(@PathVariable Integer id) {
         personService.deletePerson(id);
     }
+
 }

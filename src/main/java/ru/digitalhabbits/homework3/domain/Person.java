@@ -2,11 +2,9 @@ package ru.digitalhabbits.homework3.domain;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import ru.digitalhabbits.homework3.model.DepartmentInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @Accessors(chain = true)
@@ -28,4 +26,8 @@ public class Person {
 
     @Column
     private Integer age;
+
+    @OneToOne
+    @JoinColumn(name = "departmentID")
+    private DepartmentInfo department;
 }

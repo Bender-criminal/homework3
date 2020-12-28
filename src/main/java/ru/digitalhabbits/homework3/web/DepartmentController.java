@@ -20,6 +20,8 @@ import java.util.List;
 public class DepartmentController {
     private final DepartmentService departmentService;
 
+
+
     @ApiResponse(responseCode = "200", description = "Get all departments")
     @GetMapping
     public List<DepartmentShortResponse> departments() {

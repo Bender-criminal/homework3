@@ -15,4 +15,6 @@ public interface CrudOperations<T, ID> {
     T update(T entity);
 
     T delete(ID id);
+
+    ID create(T entity);
 }
