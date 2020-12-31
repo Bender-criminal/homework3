@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.digitalhabbits.homework3.dao.PersonDao;
+import ru.digitalhabbits.homework3.domain.Person;
+
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PersonServiceImpl.class)

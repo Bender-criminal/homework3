@@ -63,7 +63,7 @@ class PersonDaoTest {
         assertEquals( false, personDao.findById(3).isPresent());
     }
 
-    void mockData(){
+    private void mockData(){
 
         entityManager.persist(new Person()
                 .setId(1)
