@@ -2,7 +2,6 @@ package ru.digitalhabbits.homework3.domain;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.digitalhabbits.homework3.model.DepartmentInfo;
 
 import javax.persistence.*;
 
@@ -27,7 +26,9 @@ public class Person {
     @Column
     private Integer age;
 
-    @OneToOne
-    @JoinColumn(name = "departmentID")
-    private DepartmentInfo department;
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+
 }

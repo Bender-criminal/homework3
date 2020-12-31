@@ -1,35 +1,45 @@
 package ru.digitalhabbits.homework3.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
+import ru.digitalhabbits.homework3.dao.DepartmentDaoImpl;
 import ru.digitalhabbits.homework3.dao.PersonDaoImpl;
+import ru.digitalhabbits.homework3.domain.Department;
 import ru.digitalhabbits.homework3.domain.Person;
+import ru.digitalhabbits.homework3.model.DepartmentInfo;
 import ru.digitalhabbits.homework3.model.PersonRequest;
 import ru.digitalhabbits.homework3.model.PersonResponse;
 
 import javax.annotation.Nonnull;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PersonServiceImpl
         implements PersonService {
 
-    private final PersonDaoImpl dao;
+    private final PersonDaoImpl personDao;
+    private final DepartmentDaoImpl departmentDao;
 
     @Nonnull
     @Override
     public List<PersonResponse> findAllPersons() {
-        // TODO: NotImplemented: получение информации о всех людях во всех отделах
-        throw new NotImplementedException();
+        return personDao.findAll()
+                .stream()
+                .map(this::buildPersonResponse)
+                .collect(Collectors.toList());
+
     }
 
     @Nonnull
     @Override
     public PersonResponse getPerson(@Nonnull Integer id) {
-        // TODO: NotImplemented: получение информации о человеке. Если не найдено, отдавать 404:NotFound
-        Person person = dao.findById(id);
+
+        final Person person = personDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Person '" + id + "' not found"));
 
         return buildPersonResponse(person);
 
@@ -40,32 +50,44 @@ public class PersonServiceImpl
     public Integer createPerson(@Nonnull PersonRequest request) {
 
         Person person = new Person()
+                .setId(request.getId())
                 .setFirstName(request.getFirstName())
                 .setMiddleName(request.getMiddleName())
                 .setLastName(request.getLastName())
-                .setAge(request.getAge());
-        return dao.create(person);
+                .setAge(request.getAge())
+                .setDepartment(new Department().setId(request.getDepartmentInfo().getId()).setName(request.getDepartmentInfo().getName()));
+        return personDao.create(person);
     }
 
     @Nonnull
     @Override
     public PersonResponse updatePerson(@Nonnull Integer id, @Nonnull PersonRequest request) {
-        // TODO: NotImplemented: обновление информации о человеке. Если не найдено, отдавать 404:NotFound
-        throw new NotImplementedException();
+        final Person person = personDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Person '" + id + "' not found"));
+        Optional.ofNullable(request.getAge()).map(person::setAge);
+        Optional.ofNullable(request.getFirstName()).map(person::setFirstName);
+        Optional.ofNullable(request.getLastName()).map(person::setLastName);
+        Optional.ofNullable(request.getMiddleName()).map(person::setMiddleName);
+        person.setDepartment(new Department().setId(request.getDepartmentInfo().getId()).setName(request.getDepartmentInfo().getName()));
+        personDao.update(person);
+
+        return buildPersonResponse(person);
     }
 
     @Override
     public void deletePerson(@Nonnull Integer id) {
-        // TODO: NotImplemented: удаление информации о человеке и удаление его из отдела. Если не найдено, ничего не делать
-        throw new NotImplementedException();
+       if (personDao.findById(id).isPresent())
+           personDao.delete(id);
     }
 
     @Nonnull
     private PersonResponse buildPersonResponse(@Nonnull Person person) {
+        Optional<Department> department = departmentDao.findById(person.getDepartment().getId());
         return new PersonResponse()
                 .setId(person.getId())
                 .setAge(person.getAge())
                 .setFullName(String.format("%s %s %s", person.getLastName(), person.getFirstName(), person.getMiddleName()))
-                .setDepartment(person.getDepartment());
+                .setDepartment(new DepartmentInfo().setId(department.get().getId()).setName(department.get().getName()));
+
     }
 }

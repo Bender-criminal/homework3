@@ -10,6 +10,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import ru.digitalhabbits.homework3.domain.Person;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @Transactional
@@ -24,23 +30,68 @@ class PersonDaoTest {
     @Autowired
     private PersonDao personDao;
 
+
     @Test
     void findById() {
-        // TODO: NotImplemented
+        mockData();
+        Person person = personDao.findById(1).get();
+        assertEquals("ПупкинВасилийИванович", person.getLastName() + person.getFirstName() + person.getMiddleName());
     }
 
     @Test
     void findAll() {
-        // TODO: NotImplemented
+        mockData();
+        List<Person> allPersons = personDao.findAll();
+        assertEquals(4, allPersons.size());
+        assertThat(allPersons).extracting(Person::getLastName).contains("Пупкин", "Хренова", "Шариков", "Петров");
     }
 
     @Test
     void update() {
-        // TODO: NotImplemented
+        mockData();
+        Person person = personDao.findById(1).get();
+        person.setLastName("Пузиков").setFirstName("Фёдор").setMiddleName("Филиппович");
+        personDao.update(person);
+        person = personDao.findById(1).get();
+        assertEquals("ПузиковФёдорФилиппович", person.getLastName() + person.getFirstName() + person.getMiddleName());
     }
 
     @Test
     void delete() {
-        // TODO: NotImplemented
+        mockData();
+        personDao.delete(3);
+        assertEquals( false, personDao.findById(3).isPresent());
+    }
+
+    void mockData(){
+
+        entityManager.persist(new Person()
+                .setId(1)
+                .setAge(30)
+                .setFirstName("Василий")
+                .setMiddleName("Иванович")
+                .setLastName("Пупкин"));
+
+        entityManager.persist(new Person()
+                .setId(2)
+                .setAge(40)
+                .setFirstName("Гадя")
+                .setMiddleName("Петрович")
+                .setLastName("Хренова"));
+
+        entityManager.persist(new Person()
+                .setId(3)
+                .setAge(35)
+                .setFirstName("Полиграф")
+                .setMiddleName("Полиграфович")
+                .setLastName("Шариков"));
+
+        entityManager.persist(new Person()
+                .setId(4)
+                .setAge(25)
+                .setFirstName("Пётр")
+                .setMiddleName("Петрович")
+                .setLastName("Петров"));
+
     }
 }

@@ -8,7 +8,7 @@
         <property name="hibernate.hbm2ddl.auto" value="update"/>
         <property name="javax.persistence.jdbc.driver" value="com.postgres.jdbc.Driver"/>
         <property name="javax.persistence.jdbc.url" value="jdbc:postgres://127.0.0.1:5432/homework3"/>
-        <property name="javax.persistence.jdbc.user" value="postgres"/>
-        <property name="javax.persistence.jdbc.password" value="postgres"/>
+        <property name="javax.persistence.jdbc.user" value="program"/>
+        <property name="javax.persistence.jdbc.password" value="test"/>
     </properties>
 </persistence-unit>

@@ -1,77 +1,144 @@
 package ru.digitalhabbits.homework3.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.digitalhabbits.homework3.dao.DepartmentDao;
-import ru.digitalhabbits.homework3.model.DepartmentRequest;
-import ru.digitalhabbits.homework3.model.DepartmentResponse;
-import ru.digitalhabbits.homework3.model.DepartmentShortResponse;
+import ru.digitalhabbits.homework3.dao.PersonDaoImpl;
+import ru.digitalhabbits.homework3.domain.Department;
+import ru.digitalhabbits.homework3.domain.Person;
+import ru.digitalhabbits.homework3.exceptions.ConflictException;
+import ru.digitalhabbits.homework3.model.*;
 
 import javax.annotation.Nonnull;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DepartmentServiceImpl
         implements DepartmentService {
+
     private final DepartmentDao departmentDao;
+    private final PersonDaoImpl personDao;
 
     @Nonnull
     @Override
     public List<DepartmentShortResponse> findAllDepartments() {
-        // TODO: NotImplemented: получение краткой информации о всех департаментах
-        throw new NotImplementedException();
+        return departmentDao.findAll()
+                .stream()
+                .map(this::buildShortDepartmentResponse)
+                .collect(Collectors.toList());
     }
 
     @Nonnull
     @Override
     public DepartmentResponse getDepartment(@Nonnull Integer id) {
-        // TODO: NotImplemented: получение подробной информации о департаменте и краткой информации о людях в нем.
-        //  Если не найдено, отдавать 404:NotFound
-        throw new NotImplementedException();
+
+        final Department department = departmentDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Department '" + id + "' not found"));
+
+        return buildDepartmentResponse(department);
     }
 
     @Nonnull
     @Override
     public Integer createDepartment(@Nonnull DepartmentRequest request) {
-        // TODO: NotImplemented: создание нового департамента
-        throw new NotImplementedException();
+
+        Department department = new Department()
+                .setId(request.getId())
+                .setName(request.getName())
+                .setClosed(false);
+
+        return departmentDao.create(department);
     }
 
     @Nonnull
     @Override
+    @Transactional
     public DepartmentResponse updateDepartment(@Nonnull Integer id, @Nonnull DepartmentRequest request) {
-        // TODO: NotImplemented: обновление данных о департаменте. Если не найдено, отдавать 404:NotFound
-        throw new NotImplementedException();
+
+        final Department department = departmentDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Department '" + id + "' not found"));
+        Optional.ofNullable(request.getName()).map(department::setName);
+        departmentDao.update(department);
+
+        return buildDepartmentResponse(department);
     }
 
+
     @Override
+    @Transactional
     public void deleteDepartment(@Nonnull Integer id) {
-        // TODO: NotImplemented: удаление всех людей из департамента и удаление самого департамента.
-        //  Если не найдено, то ничего не делать
-        throw new NotImplementedException();
+
+        final Department department = departmentDao.findById(id).get();
+
+        if (department != null){
+            personDao.removePersonsFromDepartment(department);
+            departmentDao.delete(id);
+        }
     }
 
     @Override
+    @Transactional
     public void addPersonToDepartment(@Nonnull Integer departmentId, @Nonnull Integer personId) {
-        // TODO: NotImplemented: добавление нового человека в департамент.
-        //  Если не найден человек или департамент, отдавать 404:NotFound.
-        //  Если департамент закрыт, то отдавать 409:Conflict
-        throw new NotImplementedException();
+
+        final Department department = departmentDao.findById(departmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Department '" + departmentId + "' not found"));
+        final Person person = personDao.findById(personId)
+                .orElseThrow(() -> new EntityNotFoundException("Person '" + personId + "' not found"));
+        if (department.isClosed()) throw new ConflictException("Department '" + departmentId + "' is closed");
+
+        person.setDepartment(department);
+        personDao.update(person);
     }
 
     @Override
+    @Transactional
     public void removePersonToDepartment(@Nonnull Integer departmentId, @Nonnull Integer personId) {
-        // TODO: NotImplemented: удаление человека из департамента.
-        //  Если департамент не найден, отдавать 404:NotFound, если не найден человек в департаменте, то ничего не делать
-        throw new NotImplementedException();
+
+       departmentDao.findById(departmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Department '" + departmentId + "' not found"));
+        final Person person = personDao.findById(personId).get();
+
+        if (departmentId.equals(person.getDepartment().getId()) && person != null){
+            person.setDepartment(null);
+            personDao.update(person);
+        }
+
     }
 
     @Override
+    @Transactional
     public void closeDepartment(@Nonnull Integer id) {
-        // TODO: NotImplemented: удаление всех людей из департамента и установка отметки на департаменте,
-        //  что он закрыт для добавления новых людей. Если не найдено, отдавать 404:NotFound
-        throw new NotImplementedException();
+
+        final Department department = departmentDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Department '" + id + "' not found"));
+
+        department.setClosed(true);
+        personDao.removePersonsFromDepartment(department);
+        departmentDao.update(department);
+    }
+
+    @Nonnull
+    private DepartmentShortResponse buildShortDepartmentResponse(@Nonnull Department department) {
+        return new DepartmentShortResponse()
+                .setId(department.getId())
+                .setName(department.getName());
+    }
+
+    @Nonnull
+    private DepartmentResponse buildDepartmentResponse(Department department) {
+        List<Person> persons = personDao.getPersonsFromDepartment(department);
+        return new DepartmentResponse()
+                .setId(department.getId())
+                .setName(department.getName())
+                .setClosed(department.isClosed())
+                .setPersons(persons.stream().map(person -> new PersonInfo()
+                        .setId(person.getId())
+                        .setFullName(person.getFirstName() + " " + person.getMiddleName() + " " + person.getLastName()))
+                .collect(Collectors.toList()));
     }
 }
