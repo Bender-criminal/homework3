@@ -39,7 +39,6 @@ class DepartmentDaoImplTest {
 
     @Test
     void findAll() {
-        // TODO: NotImplemented
         mockData();
         List<Department> allDepartments = departmentDao.findAll();
         assertEquals(3, allDepartments.size());

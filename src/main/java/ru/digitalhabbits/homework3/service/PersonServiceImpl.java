@@ -1,6 +1,7 @@
 package ru.digitalhabbits.homework3.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.digitalhabbits.homework3.dao.DepartmentDaoImpl;
 import ru.digitalhabbits.homework3.dao.PersonDaoImpl;
