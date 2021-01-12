@@ -9,7 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.digitalhabbits.homework3.domain.Person;
 import ru.digitalhabbits.homework3.model.DepartmentRequest;
 import ru.digitalhabbits.homework3.model.DepartmentResponse;
 import ru.digitalhabbits.homework3.model.DepartmentShortResponse;
