@@ -23,6 +23,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = DepartmentServiceImpl.class)
@@ -73,17 +76,15 @@ class DepartmentServiceTest {
 
     @Test
     void deleteDepartment() {
-        // TODO: NotImplemented
+
         Department department = new Department().setId(5).setName("Отдел продаж");
-        Mockito.when(departmentDao.findById(5)).thenReturn(Optional.of(department));
+        Mockito.when(departmentDao.findById(anyInt())).thenReturn(Optional.of(department));
         Mockito.when(personDao.getPersonsFromDepartment(department)).thenReturn(new ArrayList<>());
 
         departmentService.deleteDepartment(5);
 
-        Mockito.when(departmentDao.findById(5)).thenReturn(Optional.empty());
-        DepartmentResponse response = departmentService.getDepartment(5);
-
-        assertEquals(0, response.getPersons().size());
+        verify(departmentDao, times(1)).findById(anyInt());
+        verify(departmentDao, times(1)).delete(anyInt());
 
     }
 
