@@ -42,4 +42,4 @@ jobs:
         uses: eskatos/gradle-command-action@v1
         with:
           build-root-directory: integration-tests
-          arguments: clean test -PtargetUrl=https://dh-homework3-by-alex-kartashov.herokuapp.com/
+          arguments: clean test -PtargetUrl=https://dh-homework3-by-alex-kartashov.herokuapp.com/api/v1
