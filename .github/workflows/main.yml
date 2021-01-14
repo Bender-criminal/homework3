@@ -29,10 +29,9 @@ jobs:
       - name: Deploy project
         uses: akhileshns/heroku-deploy@v3.4.6
         with:
-          # TODO set Heroku app name and user email
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name:
-          heroku_email:
+          heroku_api_key: c1baf5cb-78b8-4b42-baee-32af41eda5ff
+          heroku_app_name: "dh_homework3_by_alex_kartashov"
+          heroku_email: "darth_moul@rambler.ru"
       - name: Checkout test repository
         uses: actions/checkout@v2
         with:
@@ -43,5 +42,4 @@ jobs:
         uses: eskatos/gradle-command-action@v1
         with:
           build-root-directory: integration-tests
-          # TODO set Heroku service url
-          arguments: clean test -PtargetUrl=https://url.herokuapp.com
+          arguments: clean test -PtargetUrl=https://dh-homework3-by-alex-kartashov.herokuapp.com/
